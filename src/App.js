@@ -30,7 +30,9 @@ function App() {
     <Router>
       <main>
         <AuthProvider>
-          <div className="App">{showContentMenus(routes)}</div>
+          <div className="App" style={{ height: "100%" }}>
+            {showContentMenus(routes)}
+          </div>
         </AuthProvider>
       </main>
     </Router>

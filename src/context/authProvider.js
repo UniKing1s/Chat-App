@@ -7,7 +7,7 @@ const AuthProvider = ({ children }) => {
   const history = useHistory();
   useEffect(() => {
     const unsubscibed = auth.onAuthStateChanged((user) => {
-      console.log(user);
+      // console.log(user);
       if (user) {
         const { displayName, email, photoURL, uid } = user;
         setUser({
@@ -24,7 +24,7 @@ const AuthProvider = ({ children }) => {
     return () => {
       unsubscibed();
     };
-  }, []);
+  }, [history]);
   return (
     <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
   );
