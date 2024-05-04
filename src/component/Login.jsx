@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { auth, googleProvider, facebookProvider } from "../firebase/firebase";
 import {signInWithPopup, signInWithRedirect}  from 'firebase/auth'
+import { useHistory } from "react-router-dom";
 const Login = (props) => {
   // const [name, setName] = useState();
   // const [user, setUser] = useState({});
   const [inLogin, setInLogin] = useState(false);
+  const history = useHistory()
   // const windowWith = window.innerWidth;
   // const handleLogin = () => {
   //   // props.login(name);
@@ -13,6 +15,7 @@ const Login = (props) => {
   const handleLoginWithFacebook = () =>{
     if (window.innerWidth <= 500) {
       signInWithRedirect(auth,facebookProvider).then((data) =>{
+        history.push("/")
         // setUser({
         //   displayName:data.user.displayName,
         //   email: data.user.email, 
@@ -27,6 +30,7 @@ const Login = (props) => {
     } else {
       setInLogin(true);
       signInWithPopup(auth,facebookProvider).then((data) =>{
+        history.push("/")
         // setUser({
         //   displayName:data.user.displayName,
         //   email: data.user.email, 
@@ -50,6 +54,7 @@ const Login = (props) => {
     
     if (window.innerWidth <= 500) {
       signInWithRedirect(auth,googleProvider).then((data) =>{
+        history.push("/")
         // setUser({
         //   displayName:data.user.displayName,
         //   email: data.user.email, 
@@ -64,6 +69,7 @@ const Login = (props) => {
     } else {
       setInLogin(true);
       signInWithPopup(auth,googleProvider).then((data) =>{
+        history.push("/")
         // setUser({
         //   displayName:data.user.displayName,
         //   email: data.user.email, 

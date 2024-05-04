@@ -14,3 +14,5 @@
 - chỉnh một chút giao diện chat
 - chỉnh khi người dùng chat khi đang scroll bất kì vị trí sẽ đưa xuống tin nhắn mới nhất không phải người dùng thì không scroll đi đâu khi đang xem tin nhắn cũ
 - Chia component chat ra thành UserInfo.jsx
+  Update 4.1
+- fix login trên mobile
