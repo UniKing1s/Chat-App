@@ -1,4 +1,4 @@
-import React, { Children, createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { auth } from "../firebase/firebase";
 import { useHistory } from "react-router-dom";
 export const AuthContext = createContext();

@@ -5,13 +5,13 @@ const Login = (props) => {
   // const [name, setName] = useState();
   // const [user, setUser] = useState({});
   const [inLogin, setInLogin] = useState(false);
-  const windowWith = window.innerWidth;
+  // const windowWith = window.innerWidth;
   // const handleLogin = () => {
   //   // props.login(name);
   //   // history.push("/");
   // };
   const handleLoginWithFacebook = () =>{
-    if (windowWith <= 500) {
+    if (window.innerWidth <= 500) {
       signInWithRedirect(auth,facebookProvider).then((data) =>{
         // setUser({
         //   displayName:data.user.displayName,
@@ -48,7 +48,7 @@ const Login = (props) => {
   const handleLoginWithGoogle = () => {
     // setInLogin(!inLogin);
     
-    if (windowWith <= 500) {
+    if (window.innerWidth <= 500) {
       signInWithRedirect(auth,googleProvider).then((data) =>{
         // setUser({
         //   displayName:data.user.displayName,
@@ -94,11 +94,16 @@ const Login = (props) => {
           placeholder="Name"
           onChange={(e) => setName(e.target.value)}
         /> */}
-        <div style={{width:"100%", margin:"0 auto", textAlign:"center"}}>Đăng nhập</div>
+        <div style={{width:"100%", margin:"0 auto", textAlign:"center",marginBottom:"10px"}}>Đăng nhập</div>
         {/* <div>{JSON.stringify(user)}</div> */}
         {/* <button onClick={() => handleLogin()}>Login</button> */}
-        {inLogin? <div>Loading...</div>:<><button style={{width:"100%"}} onClick={() => handleLoginWithGoogle()}>Đăng nhập bằng Google</button>
-        <button style={{width:"100%"}} onClick={() => handleLoginWithFacebook()}>Đăng nhập bằng Facebook</button></>}
+        {inLogin? 
+        <div style={{width:"100%", margin:"0 auto", textAlign:"center",marginBottom:"10px"}}>Loading...</div>
+        :
+        <>
+        <button style={{width:"100%",marginBottom:"10px", background:"#FF3300", color:"white"}} onClick={() => handleLoginWithGoogle()}><strong>Đăng nhập bằng Google</strong></button>
+        <button style={{width:"100%",marginBottom:"10px", background:"#0033FF", color:"white"}} onClick={() => handleLoginWithFacebook()}><strong>Đăng nhập bằng Facebook</strong></button>
+        </>}
         
       </div>
     </div>
