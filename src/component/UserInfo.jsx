@@ -70,7 +70,7 @@ const UserInfo = (props) => {
             {users.map((otherUser, index) => (
               <button key={index} 
               className="card card-body w-100"
-              style={{marginBottom:"10px", background:"#98AFC7"}} 
+              style={{marginBottom:"10px", background:`${props.userMessing === otherUser.uid?"#3399FF":"#98AFC7"}`}} 
               onClick={() => handleChooseUserForMessage({
                 uid: otherUser.uid,
                 displayName: otherUser.displayName,

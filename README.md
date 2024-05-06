@@ -22,3 +22,5 @@
 - chat trực tuyến xử lí bằng socket.io
 - hiển thị người dùng online khi họ truy cập trang
 - Chat riêng cho người khác
+  update 5.1
+- Chọn người để chat => khung chọn đổi màu
