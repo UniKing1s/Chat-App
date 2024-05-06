@@ -24,3 +24,8 @@
 - Chat riêng cho người khác
   update 5.1
 - Chọn người để chat => khung chọn đổi màu
+  update 6
+- Chỉnh sửa giao diện chat khung chat ....
+- Nhấn enter khi soạn tin để gửi nội dung chat
+- Thêm thông tin người nhắn tin phía trên khung chat
+- fix giao diện tổng

@@ -26,9 +26,8 @@ const UserInfo = (props) => {
               };
               props.onChooseUserMessage(userChat);
             }else{}
-          }).catch((error) => {});
-        
-    }, [user,props])
+          }).catch((error) => {});  
+    }, [user])
     const handleChooseUserForMessage = (user) => {
         setUidUserChat(user.uid);
         props.onChooseUserMessage(user);

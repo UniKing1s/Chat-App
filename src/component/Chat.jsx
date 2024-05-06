@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import React, { useCallback, useContext, useEffect, useRef, useState, memo } from "react";
 // import { useHistory } from "react-router-dom";
 import { AuthContext } from "../context/authProvider";
 import UserInfo from "./UserInfo";
@@ -6,11 +6,12 @@ import { messageCallApi} from "../apiService/apiService";
 import Message from "./Message";
 import { io } from "socket.io-client";
 import { host } from "../apiService/config";
+import UserMessingInfo from "./UserMessingInfo";
 const Chat = () => {
   const [message, setMessage] = useState("");
   const [loadMess, setLoadMess] = useState(true);
   const [showInfo,setShowInfo] = useState(false);
-  const [colNumber, setColNumber] = useState(11);
+  const [colNumber, setColNumber] = useState(10);
   const [messages, setMessages] = useState([
     // { user: "Khoi", mesage: "Xin chào", date: date.toLocaleString() },
     // { user: "Huỳnh", mesage: "Chào bạn", date: date.toLocaleString() },
@@ -176,7 +177,7 @@ const Chat = () => {
     if(!showInfo){
       setColNumber(8);
     }else {
-      setColNumber(11);
+      setColNumber(10);
     }
   },[showInfo])
   const handleUserMessage = useCallback((user) => {
@@ -199,7 +200,8 @@ const Chat = () => {
         showInfo={showInfo} 
         onClickShowInfo = {handleShowInFo}/>
         <div className={`col-${colNumber}`} style={{ margin: "0 auto", height:layoutHeight, color:"white", paddingTop:"10px", paddingBottom:"10px"}}>
-          <div style={{height:layoutHeight*0.85, position:"relative", background:"url(space.jpg)", backgroundSize:"cover", backgroundPosition:"center"}}>
+          <UserMessingInfo layoutHeight = {layoutHeight} user = {userMessing} usersOnline = {usersOnline}/>
+          <div className="rounded" style={{height:layoutHeight*0.80, position:"relative", background:"url(space.jpg)", backgroundSize:"cover", backgroundPosition:"center", marginBottom:"10px"}}>
             {loadMess?
             <>
             <div style={{position:"absolute", top:"50%", right:"45%", width:"50px", height:"50px"}} ref={divChat} className="spinner-border text-primary" role="status">
@@ -208,25 +210,49 @@ const Chat = () => {
             </>
             :
             <>
-            <div ref={divChat} style={{ position:"absolute", bottom:"0px", width:"100%", maxHeight:layoutHeight*0.85, overflowY: "auto",scrollbarWidth:"thin", scrollBehavior:"smooth", padding:"10px"}}>
+            <div ref={divChat} style={{ position:"absolute", bottom:"0px", width:"100%", maxHeight:layoutHeight*0.80, overflowY: "auto",scrollbarWidth:"thin",scrollBehavior:"smooth", padding:"10px"}}>
             <Message user = {user} userMessing = {userMessing} messages = {messages}/>
             </div>
             </>}
           </div>
-          <br></br>
-          <div style={{marginBottom:"10px"}}><input
+          <div >
+          <div class="input-group">
+            <input type="text" 
+            value={message}
+             className="form-control" 
+             placeholder="Nhắn tin" 
+             aria-label="Soạn tin nhắn" 
+             aria-describedby="button-addon2"
+             onChange={(e) => setMessage(e.target.value)}
+             ref={input}
+             style={{borderTopLeftRadius:"50px", borderBottomLeftRadius:"50px"}}
+             onKeyPress={(e) => {
+               if (e.key === "Enter") {
+                 handleSendMess();
+               }
+             }}
+             />
+            <button 
+            className="btn btn-secondary" 
+            type="button" 
+            style={{borderTopRightRadius:"50px", borderBottomRightRadius:"50px"}}
+            id="button-addon2"
+            onClick={handleSendMess}>Gửi</button>
+          </div>
+            {/* <input
             placeholder="nhắn tin"
             value={message}
             style={{ width: "75%", float: "left" }}
             onChange={(e) => setMessage(e.target.value)}
             ref={input}
-          />
-          <button
+          /> */}
+          {/* <button
             style={{ width: "20%", float: "right" }}
             onClick={handleSendMess}
           >
             Gửi
-          </button></div>
+          </button> */}
+          </div>
       </div>
     </div>
     
@@ -234,4 +260,4 @@ const Chat = () => {
   );
 };
 
-export default Chat;
+export default memo(Chat);
