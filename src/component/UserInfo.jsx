@@ -10,6 +10,7 @@ const UserInfo = (props) => {
         props.onClickShowInfo()
     }
     const handleLogout = () => {
+        props.onLogout();;
         auth.signOut();
     }
     useEffect(() => {

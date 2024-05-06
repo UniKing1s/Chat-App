@@ -168,6 +168,9 @@ const Chat = () => {
   //     messageCallApi("message", "GET", { uid: uidUserMessing, uidSend: user.uid })
   //   }
   // },[uidUserMessing])
+  const handleLogout = useCallback(() =>{
+    socket.current.emit("user-offline",{uid:user.uid});
+  },[user])
   const handleShowInFo = useCallback(() => {
     setShowInfo(!showInfo);
     if(!showInfo){
@@ -185,7 +188,7 @@ const Chat = () => {
     <>{user&&
     <div className="container" style={{ background: "#3366CC" }}>
       <div className="row">
-        <UserInfo layoutHeight = {layoutHeight} usersOnline = {usersOnline} socket = {socket} user = {user} onChooseUserMessage = {handleUserMessage} colNumber={colNumber} showInfo={showInfo} onClickShowInfo = {handleShowInFo}/>
+        <UserInfo onLogout = {handleLogout} layoutHeight = {layoutHeight} usersOnline = {usersOnline} socket = {socket} user = {user} onChooseUserMessage = {handleUserMessage} colNumber={colNumber} showInfo={showInfo} onClickShowInfo = {handleShowInFo}/>
         <div className={`col-${colNumber}`} style={{ margin: "0 auto", height:layoutHeight, color:"white", paddingTop:"10px", paddingBottom:"10px"}}>
           <div style={{height:layoutHeight*0.85, position:"relative", background:"url(space.jpg)", backgroundSize:"cover", backgroundPosition:"center"}}>
             {loadMess?

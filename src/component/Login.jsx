@@ -1,13 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth, googleProvider, facebookProvider } from "../firebase/firebase";
 import {signInWithPopup, signInWithRedirect}  from 'firebase/auth'
 import { useHistory } from "react-router-dom";
-import { AuthContext } from "../context/authProvider";
+// import { AuthContext } from "../context/authProvider";
 const Login = (props) => {
   // const [name, setName] = useState();
   // const [user, setUser] = useState({});
   const [inLogin, setInLogin] = useState(false);
-  const {user} = useContext(AuthContext);
   const history = useHistory()
   // const windowWith = window.innerWidth;
   // const handleLogin = () => {

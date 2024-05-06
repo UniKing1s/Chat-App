@@ -22,7 +22,9 @@ const AuthProvider = ({ children }) => {
             }
             // console.log(res);
           })
-          .catch((error) => {});
+          .catch((error) => {
+            console.log("nothing");
+          });
         setUser({
           displayName,
           email,
