@@ -16,3 +16,9 @@
 - Chia component chat ra thành UserInfo.jsx
   Update 4.1
 - fix login trên mobile
+  Update 5
+- Chuyển dữ liệu lưu trữ lên mongodb
+- định tuyến dữ liệu lên csdl với api
+- chat trực tuyến xử lí bằng socket.io
+- hiển thị người dùng online khi họ truy cập trang
+- Chat riêng cho người khác

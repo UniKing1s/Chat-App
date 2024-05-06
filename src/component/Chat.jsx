@@ -1,8 +1,11 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { database, ref, push, onValue } from "../firebase/firebase";
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 import { AuthContext } from "../context/authProvider";
 import UserInfo from "./UserInfo";
+import { messageCallApi} from "../apiService/apiService";
+import Message from "./Message";
+import { io } from "socket.io-client";
+import { host } from "../apiService/config";
 const Chat = () => {
   const [message, setMessage] = useState("");
   const [loadMess, setLoadMess] = useState(true);
@@ -12,9 +15,12 @@ const Chat = () => {
     // { user: "Khoi", mesage: "Xin chào", date: date.toLocaleString() },
     // { user: "Huỳnh", mesage: "Chào bạn", date: date.toLocaleString() },
   ]);
+  const [usersOnline, setUsersOnline] = useState ([]);
+  const socket = useRef();
   const [layoutHeight, setLayoutHeight] = useState(window.innerHeight);
   const {user} = useContext(AuthContext);
-  const history = useHistory()
+  const [userMessing, setUserMessing] = useState({});
+  // const history = useHistory()
   const userSendMessCheck = useRef(false)
   const input = useRef()
   const divChat = useRef()
@@ -27,28 +33,42 @@ const Chat = () => {
     return () =>{
       window.removeEventListener('resize', handleResize)
     }
-  })
+  },[])
   useEffect(() => {
-    if(!user){
-      history.push('/login')
-    }
-    onValue(ref(database, 'message'),data =>{
-      let getMes = [];
-      data.forEach((item) => {
-        getMes.push({
-          user: item.val().user,
-          mesage: item.val().message,
-          date: item.val().date,
-          photoURL: item.val().photoURL,
-          uid: item.val().uid
-        })
+    if(userMessing){
+      messageCallApi(`/getMess?user=${user.uid}&userMessing=${userMessing.uid}`,"GET", null).then(res => {
+        if(res.status === 200){
+          console.log(res.data.mess)
+          setMessages(res.data.mess);
+          userSendMessCheck.current = true
+          setLoadMess(false)
+        }else{
+          console.log(res.status)
+        }
+      }).catch(err => {
+        console.log(err)
       })
-      setLoadMess(false);
-      setMessages(getMes);
-    })
-  },[history,user])
+    }
+  },[userMessing,user])
+  // useEffect(() => {
+  //   onValue(ref(database, 'message'),data =>{
+  //     let getMes = [];
+  //     data.forEach((item) => {
+  //       getMes.push({
+  //         user: item.val().user,
+  //         mesage: item.val().message,
+  //         date: item.val().date,
+  //         photoURL: item.val().photoURL,
+  //         uid: item.val().uid
+  //       })
+  //     })
+  //     setLoadMess(false);
+  //     setMessages(getMes);
+  //   })
+  // },[history,user])
   useEffect(() => {
     document.title = 'Chat Group'
+    return () => socket.current.disconnect();
   },[])
   useEffect(() => {
     if (divChat.current) {
@@ -63,6 +83,7 @@ const Chat = () => {
     }
   },[messages])
 
+
   useEffect(() => {
   let currentDivChat = null;
   const handleDivChatScroll = () =>{
@@ -74,21 +95,79 @@ const Chat = () => {
         currentDivChat.removeEventListener('scroll', handleDivChatScroll)
     }
   },[divChat])
+
+  useEffect(() => {
+    if (user) {
+      socket.current = io(host);
+      socket.current.emit("add-user", user.uid);
+      // socket.current.on("send-online-user", (data) => {
+      //   console.log(data);
+      // }) 
+      socket.current.on("send-online-user", (data) => {
+        console.log("userInOnline:" ,data.userInOnline);
+        setUsersOnline(data.userInOnline);
+      })
+    }
+  }, [user])
+  useEffect(() => {
+    if(user){
+      const handleCloseWeb = () =>{
+        socket.current.emit("user-offline",{uid:user.uid})
+      }
+      window.addEventListener('beforeunload', handleCloseWeb);
+      return () => {
+        window.removeEventListener('beforeunload', handleCloseWeb);
+      }
+    }
+    // socket.current.on("send-online-user", (data) => {
+    //   setUsersOnline(data.userInOnline);
+    // })
+  },[user, socket])
+
+
+  useEffect(() => {
+    if(user && userMessing){
+      socket.current.on("msg-receive", (data) => {
+        if(data.toUid === user.uid && data.fromUid === userMessing.uid){
+        setMessages((prev) => [...prev, data]);
+      }
+      })
+    }
+    return() => {
+      socket.current.off("msg-receive")
+    }
+  },[user, userMessing])
+
   const handleSendMess = () => {
     const newDate = new Date();
     if (message !== "" || message.replaceAll(" ", "") !== ""){
-      push(ref(database, 'message'), {
-        user: user.displayName,
-        message: message,
-        date: newDate.toLocaleString(),
-        photoURL: user.photoURL,
-        uid: user.uid
+      messageCallApi("/","POST",{message:{fromUid: user.uid, toUid: userMessing.uid, message: message, date: newDate.toLocaleString()}}).then(res => {
+        if (res.status === 200) {
+          console.log(res.data)
+          userSendMessCheck.current = true
+          socket.current.emit("msg-sent", {fromUid: user.uid, toUid: userMessing.uid, message: message, date: newDate.toLocaleString()});
+          setMessages(prev => 
+            [...prev, 
+              {fromUid: user.uid, 
+                toUid: userMessing.uid, 
+                message: message, 
+                date: newDate.toLocaleString()}])
+          setMessage("");
+          input.current.focus();
+        }else {
+          console.log(res.status)
+        }
+      }).catch(err => {
+        console.log(err)
       })
-      userSendMessCheck.current = true
-      setMessage("");
-      input.current.focus();
     }
+    
   };
+  // useEffect(() => {
+  //   if (uidUserMessing) {
+  //     messageCallApi("message", "GET", { uid: uidUserMessing, uidSend: user.uid })
+  //   }
+  // },[uidUserMessing])
   const handleShowInFo = useCallback(() => {
     setShowInfo(!showInfo);
     if(!showInfo){
@@ -96,13 +175,17 @@ const Chat = () => {
     }else {
       setColNumber(11);
     }
-    
   },[showInfo])
+  const handleUserMessage = useCallback((user) => {
+    console.log(user)
+    setUserMessing(user)
+  },[])
+  // console.log(user)
   return (
     <>{user&&
-    <div className="container">
+    <div className="container" style={{ background: "#3366CC" }}>
       <div className="row">
-        <UserInfo colNumber={colNumber} showInfo={showInfo} onClickShowInfo = {handleShowInFo}/>
+        <UserInfo layoutHeight = {layoutHeight} usersOnline = {usersOnline} socket = {socket} user = {user} onChooseUserMessage = {handleUserMessage} colNumber={colNumber} showInfo={showInfo} onClickShowInfo = {handleShowInFo}/>
         <div className={`col-${colNumber}`} style={{ margin: "0 auto", height:layoutHeight, color:"white", paddingTop:"10px", paddingBottom:"10px"}}>
           <div style={{height:layoutHeight*0.85, position:"relative", background:"url(space.jpg)", backgroundSize:"cover", backgroundPosition:"center"}}>
             {loadMess?
@@ -114,46 +197,9 @@ const Chat = () => {
             :
             <>
             <div ref={divChat} style={{ position:"absolute", bottom:"0px", width:"100%", maxHeight:layoutHeight*0.85, overflowY: "auto",scrollbarWidth:"thin", scrollBehavior:"smooth", padding:"10px"}}>
-            {messages.map((mes, index) => {
-              return (
-                <div key={index} >
-                  {mes.user !== user.displayName && mes.uid !== user.uid ? (
-                    <>
-                      <div style={{ float: "left", }}>
-                      <img style={{borderRadius:"50%", width:"30px", height:"30px",float: "left", marginRight:"3px"}} src={mes.photoURL} alt={user.displayName}></img>
-                        <div className="border-none" style={{float: "right", background:"#CC00FF", borderRadius:"15px", paddingRight:"10px", paddingLeft:"10px" }}>
-                          {mes.mesage}
-                        </div>
-                      </div>
-                      <br/>
-                      <br/>
-                      <div style={{ float: "left" , fontSize: "10px"}}>
-                        {mes.date}
-                      </div>
-                      <br></br>
-                    </>
-                  ) : (
-                    <>
-                      <div style={{ float: "right" }}>
-                        <div className="border-none" style={{ float: "left", borderRadius:"15px", background:"#0000BB", paddingRight:"10px", paddingLeft:"10px" }}>{mes.mesage}</div>
-                        <img 
-                        style={{borderRadius:"50%", width:"30px", height:"30px", float:"right" ,marginLeft:"3px"}} 
-                        src={mes.photoURL} 
-                        alt={user.displayName}
-                        />                        
-                      </div>
-                      <br></br>
-                      <br />
-                      <div style={{ float: "right",fontSize: "10px" }}>
-                        {mes.date}
-                      </div>
-                      <br></br>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-            </div></>}
+            <Message user = {user} userMessing = {userMessing} messages = {messages}/>
+            </div>
+            </>}
           </div>
           <br></br>
           <div style={{marginBottom:"10px"}}><input
