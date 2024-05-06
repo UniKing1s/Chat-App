@@ -189,7 +189,6 @@ const Chat = () => {
     <div className="container" style={{ background: "#3366CC" }}>
       <div className="row">
         <UserInfo 
-        userMessing = {userMessing.uid}
         onLogout = {handleLogout} 
         layoutHeight = {layoutHeight} 
         usersOnline = {usersOnline} 

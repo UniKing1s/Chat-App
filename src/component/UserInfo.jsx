@@ -6,6 +6,7 @@ const UserInfo = (props) => {
     const {user} = props;
     console.log(user)
     const [users, setUsers] = useState([]);
+    const [uidUserChat, setUidUserChat] = useState("");
     const handleShowInFo = () => {
         props.onClickShowInfo()
     }
@@ -29,6 +30,7 @@ const UserInfo = (props) => {
         
     }, [user,props])
     const handleChooseUserForMessage = (user) => {
+        setUidUserChat(user.uid);
         props.onChooseUserMessage(user);
     }
     console.log("render-info")
@@ -70,7 +72,7 @@ const UserInfo = (props) => {
             {users.map((otherUser, index) => (
               <button key={index} 
               className="card card-body w-100"
-              style={{marginBottom:"10px", background:`${props.userMessing === otherUser.uid?"#3399FF":"#98AFC7"}`}} 
+              style={{marginBottom:"10px", background:`${uidUserChat === otherUser.uid?"#3399FF":"#98AFC7"}`}} 
               onClick={() => handleChooseUserForMessage({
                 uid: otherUser.uid,
                 displayName: otherUser.displayName,
